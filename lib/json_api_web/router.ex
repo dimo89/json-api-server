@@ -13,10 +13,16 @@ defmodule JsonApiWeb.Router do
     plug :accepts, ["json"]
   end
 
-  scope "/", JsonApiWeb do
-    pipe_through :browser # Use the default browser stack
+  pipeline :json_api do
+    plug :accepts, ["json-api"]
+    plug JaSerializer.Deserializer
+  end
 
-    get "/", PageController, :index
+  scope "/api", JsonApiWeb do
+    pipe_through :json_api # Use the default browser stack
+
+    resources "/projects", ProjectController, only: [:index, :show]
+    resources "/documents", DocumentController, only: [:index, :show]
   end
 
   # Other scopes may use custom stacks.
